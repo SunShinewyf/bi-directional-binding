@@ -25,13 +25,13 @@ class Observer {
    * @param {key} 要监听的对象属性key值
    * @param {value} 要监听的对象属性值
    */
-  defineRective = (data, key, value) => {
-    let self = this;
-    //如果是该属性值是对象类型，则遍历
-    if (value && typeof value === 'object') {
-      this.observer(value);
-    }
-  };
+  //   defineRective = (data, key, value) => {
+  //     let self = this;
+  //     //如果是该属性值是对象类型，则遍历
+  //     if (value && typeof value === 'object') {
+  //       this.observer(value);
+  //     }
+  //   };
 }
 
 export default Observer;
