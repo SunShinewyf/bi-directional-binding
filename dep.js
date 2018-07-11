@@ -1,7 +1,7 @@
 /**
  * author: SunShinewyf
  * date: 2018-07-11
- * desc: 依赖类
+ * desc: 消息订阅器的容器 --- 用于收集订阅者 watcher 负责添加watcher，更新watcher，移除watcher,通知watcher更新
  */
 //订阅事件的唯一标识
 let uid = 0;
@@ -26,12 +26,14 @@ Dep.prototype = {
       this.subs.splice(index, 1);
     }
   },
+
   depend: function() {
-    Dep.target.addDep(this);
+    Dep.target.addDep(this); //执行 watcher 的 addDep 方法
   },
+
   notify: function() {
     this.subs.forEach(sub => {
-      sub.update();
+      sub.update(); //执行 watcher 的 update 方法
     });
   }
 };

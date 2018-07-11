@@ -10,7 +10,6 @@ function Observer(data) {
 
 Observer.prototype = {
   /**
-   *
    * @param {data} 要监听的数据对象
    */
   observe: data => {
@@ -42,7 +41,7 @@ Observer.prototype = {
         if (newVal === val) return;
 
         val = newVal;
-        //新的值是 object 的话，进行监听
+        //对新值进行监听
         childObj = instanceObserver(newVal);
         //通知所有订阅者
         dep.notify();
@@ -53,11 +52,11 @@ Observer.prototype = {
 
 /**
  * 实例化监听对象
- * @param {需要实例化的值} val
+ * @param {val} 需要实例化的值
  */
-instanceObserver: val => {
+function instanceObserver(val) {
   if (!val || typeof val !== 'object') return;
   return new Observer(val);
-};
+}
 
 export default Observer;
