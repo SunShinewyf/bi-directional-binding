@@ -5,6 +5,7 @@
  */
 function Observer(data) {
   this.data = data;
+  let dep = new Dep();
   this.observe(this.data);
 }
 
@@ -26,7 +27,6 @@ Observer.prototype = {
    */
   defineReactive: (data, key, value) => {
     let dep = new Dep();
-
     let self = this;
     //如果是该属性值是对象类型，则遍历
     let childObj = instanceObserver(value);
@@ -35,6 +35,11 @@ Observer.prototype = {
       enumerable: true,
       configurable: false,
       get: () => {
+        //由于需要在闭包内添加watcher，所有需要 Dep 定义一个全局 target 属性，暂存 watcher ，添加完移除
+        if (Dep.target) {
+          //如果为true，则说明是实例化 watcher 引起的，所以需要添加进消息订阅器中
+          dep.depend();
+        }
         return value;
       },
       set: newVal => {
