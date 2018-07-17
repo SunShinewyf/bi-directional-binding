@@ -33,14 +33,14 @@ Compile.prototype = {
   //编译函数
   compile: function(fragment) {
     let childNodes = fragment.childNodes;
-    childNodes.forEach(node => {
+    Array.from(childNodes).forEach(node => {
       //是否是元素节点
       if (this.isElementNode(node)) {
         this.compileElement(node);
         this.compile(node);
       } else {
         //是否是文本节点
-        this.compileText();
+        this.compileText(node);
       }
     });
   },
@@ -54,24 +54,22 @@ Compile.prototype = {
   compileElement: function(node) {
     // 带v-model v-text
     let attrs = node.attributes; // 取出当前节点的属性
-    attrs &&
-      attrs.forEach(attr => {
-        // 判断属性名字是不是包含v-model
-        let attrName = attr.name;
-        if (this.isDirective(attrName)) {
-          // 取到对应的值放到节点中
-          let expr = attr.value;
-          let [, type] = attrName.split('-'); //
-          // 调用对应的编译方法 编译哪个节点,用数据替换掉表达式
-          CompileUtil[type](node, this.vm, expr);
-        }
-      });
+    Array.from(attrs).forEach(attr => {
+      let attrName = attr.name;
+      if (this.isDirective(attrName)) {
+        // 取到指令对应的值放到节点中
+        let expr = attr.value;
+        let [, type] = attrName.split('-'); //获取指令是哪种类型，比如v-model,v-text
+        // 调用对应的编译方法 编译哪个节点,用数据替换掉表达式
+        CompileUtil[type](node, this.vm, expr);
+      }
+    });
   },
 
   //编译文本元素
   compileText: function(node) {
-    let expr = node.textContent; // 取文本中的内容
-    let reg = /\{\{([^}]+)\}\}/g; // {{a}} {{b}} {{c}}
+    let expr = node.textContent; // 取文本中的内容 todo:和 innerHTML 的区别
+    let reg = /\{\{([^}]+)\}\}/g; // 不能直接检测 {{}} 这种情况，还要考虑这种情况 {{a}} {{b}} {{c}}
     if (reg.test(expr)) {
       // 调用编译文本的方法 编译哪个节点,用数据替换掉表达式
       CompileUtil['text'](node, this.vm, expr);
