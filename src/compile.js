@@ -3,7 +3,8 @@
  * date: 2018-07-16
  * desc: 编译类
  */
-function Compile(el, vm) {
+function Compile(options) {
+  const { el } = options;
   this.el = this.isElementNode(el) ? el : document.querySelector(el);
   if (this.el) {
     //将真实DOM移入内存 fragment 中
@@ -18,10 +19,11 @@ Compile.prototype = {
   //将 DOM 转化为 fragment
   node2Fragment: function(el) {
     let fragment = document.createDocumentFragment();
-    let firstChild;
-    while ((firstChild = el.firstChild)) {
-      fragment.appendChild(firstChild);
+    //每次获取DOM节点树中的第一个元素，直到移除完毕为止
+    while (el.firstChild) {
+      fragment.appendChild(el.firstChild);
     }
+    //返回一个文档碎片容器，存储DOM树的所有节点
     return fragment;
   },
   //是否是DOM节点元素
@@ -32,10 +34,12 @@ Compile.prototype = {
   compile: function(fragment) {
     let childNodes = fragment.childNodes;
     childNodes.forEach(node => {
+      //是否是元素节点
       if (this.isElementNode(node)) {
         this.compileElement(node);
         this.compile(node);
       } else {
+        //是否是文本节点
         this.compileText();
       }
     });

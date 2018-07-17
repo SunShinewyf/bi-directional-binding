@@ -9,9 +9,26 @@
 <head>
     <meta charset="UTF-8">
     <title>bi-directional-binding example</title>
+    <script src="../src/compile.js"></script>
 </head>
 
 <body>
+    <div id="app">
+        <input type="input" v-model="hello" />
+        <div>{{hello}}</div>
+        <ul>
+            <li></li>
+        </ul>
+        {{hello}}
+    </div>
 </body>
+<script>
+    let vm = new Compile({
+        el: '#app',
+        data: {
+            hello: '你好',
+        }
+    })
+</script>
 
 </html>
