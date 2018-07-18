@@ -5,7 +5,6 @@
  */
 function Observer(data) {
   this.data = data;
-  let dep = new Dep();
   this.observe(this.data);
 }
 
@@ -13,10 +12,12 @@ Observer.prototype = {
   /**
    * @param {data} 要监听的数据对象
    */
-  observe: data => {
+  observe: function(data) {
+    if (!data || typeof data !== 'object') return;
     //为每一个属性设置数据监听
     Object.keys(data).forEach(key => {
       this.defineReactive(data, key, data[key]);
+      this.observe(data[key]); //深度递归劫持属性
     });
   },
 
@@ -25,13 +26,12 @@ Observer.prototype = {
    * @param {key} 要监听的对象属性key值
    * @param {value} 要监听的对象属性值
    */
-  defineReactive: (data, key, value) => {
+  defineReactive: function(data, key, value) {
     let dep = new Dep();
     let self = this;
-    //如果是该属性值是对象类型，则遍历
-    let childObj = instanceObserver(value);
 
-    object.defineProperty(data, key, {
+    //如果是该属性值是对象类型，则遍历
+    Object.defineProperty(data, key, {
       enumerable: true,
       configurable: false,
       get: () => {
@@ -43,25 +43,13 @@ Observer.prototype = {
         return value;
       },
       set: newVal => {
-        if (newVal === val) return;
-
-        val = newVal;
+        if (newVal === value) return;
+        value = newVal;
         //对新值进行监听
-        childObj = instanceObserver(newVal);
+        self.observe(newVal);
         //通知所有订阅者
         dep.notify();
       }
     });
   }
 };
-
-/**
- * 实例化监听对象
- * @param {val} 需要实例化的值
- */
-function instanceObserver(val) {
-  if (!val || typeof val !== 'object') return;
-  return new Observer(val);
-}
-
-export default Observer;

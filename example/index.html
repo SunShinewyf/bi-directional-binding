@@ -9,24 +9,29 @@
 <head>
     <meta charset="UTF-8">
     <title>bi-directional-binding example</title>
+    <script src="../src/dep.js"></script>
+    <script src="../src/watcher.js"></script>
+    <script src="../src/observer.js"></script>
     <script src="../src/compile.js"></script>
+    <script src="../src/mvvm.js"></script>
 </head>
 
 <body>
     <div id="app">
-        <input type="input" v-model="hello" />
-        <div>{{hello}}</div>
+        <input type="input" v-model="hello.a.b" />
+        <div>{{hello.a.b}}{{world}}</div>
         <ul>
             <li></li>
         </ul>
-        {{hello}}
+        {{hello.a.b}}{{world}}
     </div>
 </body>
 <script>
-    let vm = new Compile({
+    let vm = new MVVM({
         el: '#app',
         data: {
-            hello: '你好',
+            hello: { a: { b: 'hello world' } },
+            world: 'ooo'
         }
     })
 </script>

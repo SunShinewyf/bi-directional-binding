@@ -40,5 +40,3 @@ Dep.prototype = {
 
 //Dep 类的全局属性 target，是一个 Watch 实例
 Dep.target = null;
-
-export default Dep;
