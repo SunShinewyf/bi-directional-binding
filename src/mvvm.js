@@ -7,6 +7,7 @@
 function MVVM(options) {
   this.$el = options.el;
   this.$data = options.data;
+  this.$method = options.method;
   if (this.$el) {
     //对所有数据进行劫持
     new Observer(this.$data);

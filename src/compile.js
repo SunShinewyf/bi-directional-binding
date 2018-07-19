@@ -50,6 +50,11 @@ Compile.prototype = {
     return name.indexOf('v-') > -1;
   },
 
+  //是否是事件指令
+  isEventDirective: function(dir) {
+    return dir.indexOf('on') === 0;
+  },
+
   //编译节点元素
   compileElement: function(node) {
     // 带v-model v-text
@@ -60,8 +65,13 @@ Compile.prototype = {
         // 取到指令对应的值放到节点中
         let expr = attr.value;
         let type = attrName.split('-')[1]; //获取指令是哪种类型，比如v-model,v-text
-        // 调用对应的编译方法 编译哪个节点,用数据替换掉表达式
-        CompileUtil[type](node, this.vm, expr);
+        //如果是事件指令
+        if (this.isEventDirective(type)) {
+          CompileUtil.eventHandler(node, this.vm, expr, type);
+        } else {
+          // 调用对应的编译方法 编译哪个节点,用数据替换掉表达式
+          CompileUtil[type](node, this.vm, expr);
+        }
       }
     });
   },
@@ -96,10 +106,25 @@ var CompileUtil = {
   //html指令处理
   html: function(node, vm, expr) {
     let updateFn = Updater['htmlUpdater'];
+    //更新渲染
     new Watcher(vm, expr, newValue => {
       updateFn && updateFn(node, newValue);
     });
+    //初始化渲染
+    updateFn && updateFn(node, this.getVal(vm, expr));
   },
+
+  //class 指令处理
+  class: function(node, vm, expr) {
+    let updateFn = Updater['classUpdater'];
+    //更新渲染
+    new Watcher(vm, expr, newValue => {
+      updateFn && updateFn(node, newValue);
+    });
+    //初始化渲染
+    updateFn && updateFn(node, this.getVal(vm, expr));
+  },
+
   //model指令处理
   model: function(node, vm, expr) {
     let updateFn = Updater['modelUpdater'];
@@ -112,6 +137,15 @@ var CompileUtil = {
       this.setVal(vm, expr, newValue);
     });
     updateFn && updateFn(node, this.getVal(vm, expr));
+  },
+
+  //事件指令处理
+  eventHandler: function(node, vm, expr, type) {
+    let eventType = type.split(':')[1],
+      fn = vm.$method[expr];
+    if (eventType && fn) {
+      node.addEventListener(eventType, fn.bind(vm), false);
+    }
   },
 
   //获取文本的值
@@ -150,6 +184,13 @@ var Updater = {
   //html 更新
   htmlUpdater: function(node, value) {
     node.innerHTML = typeof value === 'undefined' ? '' : value;
+  },
+  //class 更新
+  classUpdater: function(node, value) {
+    let className = node.className;
+    className = className.replace(value, '').replace(/\s$/, '');
+    var space = className && String(value) ? ' ' : '';
+    node.className = className + space + value;
   },
   //model 更新
   modelUpdater: function(node, value) {

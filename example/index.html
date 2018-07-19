@@ -14,13 +14,17 @@
     <script src="../src/observer.js"></script>
     <script src="../src/compile.js"></script>
     <script src="../src/mvvm.js"></script>
+    <link type="text/css" rel="stylesheet" href="index.css">
 </head>
 
 <body>
     <div id="app">
         <input type="input" v-model="message.a.b" />
+        <p class="abc" v-class="className">按钮</p>
         <div>{{message.a.b}} {{more}}</div>
         {{message.a.b}} {{more}}
+        <p v-html="htmlStr"></p>
+        <button v-on:click="clickBtn">change model</button>
     </div>
 </body>
 <script>
@@ -28,7 +32,15 @@
         el: '#app',
         data: {
             message: { a: { b: 'hello world' } },
-            more: 'mvvm'
+            className: 'btn',
+            more: 'mvvm',
+            htmlStr: '<span style="color: #f00;">red</span>',
+        },
+        method: {
+            clickBtn: function (e) {
+                let strArr = ['one', 'two', 'three'];
+                this.message.a.b = strArr[parseInt(Math.random() * 3)]
+            }
         }
     })
 </script>
