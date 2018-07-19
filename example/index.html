@@ -18,20 +18,17 @@
 
 <body>
     <div id="app">
-        <input type="input" v-model="hello.a.b" />
-        <div>{{hello.a.b}}{{world}}</div>
-        <ul>
-            <li></li>
-        </ul>
-        {{hello.a.b}}{{world}}
+        <input type="input" v-model="message.a.b" />
+        <div>{{message.a.b}} {{more}}</div>
+        {{message.a.b}} {{more}}
     </div>
 </body>
 <script>
     let vm = new MVVM({
         el: '#app',
         data: {
-            hello: { a: { b: 'hello world' } },
-            world: 'ooo'
+            message: { a: { b: 'hello world' } },
+            more: 'mvvm'
         }
     })
 </script>

@@ -88,7 +88,7 @@ var CompileUtil = {
       new Watcher(vm, arguments[1], newValue => {
         //传入每次的表达式，比如出现 {{a}} {{b}}, 就要分别取获取表达式 a,b 的值,
         //如果直接传入 newValue,则后一个值会覆盖前一个值
-        updateFn && updateFn(node, this.getTextVal());
+        updateFn && updateFn(node, this.getTextVal(vm, expr));
       });
     });
     updateFn && updateFn(node, value);
@@ -106,6 +106,11 @@ var CompileUtil = {
     new Watcher(vm, expr, newValue => {
       updateFn && updateFn(node, newValue);
     });
+    //监听输入框的input事件，并将值回填到数据中
+    node.addEventListener('input', e => {
+      let newValue = e.target.value;
+      this.setVal(vm, expr, newValue);
+    });
     updateFn && updateFn(node, this.getVal(vm, expr));
   },
 
@@ -120,6 +125,17 @@ var CompileUtil = {
   getVal: function(vm, expr) {
     expr = expr.split('.'); //将 hello.a.b 转化为数组,调用reduce获取最里面的值
     return expr.reduce((prev, next) => {
+      return prev[next];
+    }, vm.$data);
+  },
+  //设置值
+  setVal: function(vm, expr, value) {
+    expr = expr.split('.');
+    //将新值回填到数据中，并且回填到最后一个值，如:hello.a.b，就需要把值回填到b中
+    return expr.reduce((prev, next, index) => {
+      if (index === expr.length - 1) {
+        return (prev[next] = value);
+      }
       return prev[next];
     }, vm.$data);
   }
