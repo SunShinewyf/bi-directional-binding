@@ -47,12 +47,13 @@ Compile.prototype = {
 
   //判断是否是指令
   isDirective: function(name) {
-    return name.indexOf('v-') > -1;
+    //不能使用 indexOf 的方式，因为可能出现 v-model-v-model,必须以 v- 开头
+    return name.startsWith('v-');
   },
 
   //是否是事件指令
   isEventDirective: function(dir) {
-    return dir.indexOf('on') === 0;
+    return dir.startsWith('on');
   },
 
   //编译节点元素
@@ -64,7 +65,12 @@ Compile.prototype = {
       if (this.isDirective(attrName)) {
         // 取到指令对应的值放到节点中
         let expr = attr.value;
-        let type = attrName.split('-')[1]; //获取指令是哪种类型，比如v-model,v-text
+        const attrArr = attrName.split('-');
+        //说明此时不是 v-model 的这种形式，而是 v-model-v-model
+        if (attrArr.length !== 2) {
+          return;
+        }
+        let type = attrArr[1]; //获取指令是哪种类型，比如v-model,v-text
         //如果是事件指令
         if (this.isEventDirective(type)) {
           CompileUtil.eventHandler(node, this.vm, expr, type);
@@ -141,6 +147,7 @@ var CompileUtil = {
 
   //事件指令处理
   eventHandler: function(node, vm, expr, type) {
+    //todo
     let eventType = type.split(':')[1],
       fn = vm.$method[expr];
     if (eventType && fn) {
